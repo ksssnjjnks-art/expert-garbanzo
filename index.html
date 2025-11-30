@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FARMKES - Кликай и зарабатывай</title>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .header {
+            margin-bottom: 30px;
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        
+        .stat-box {
+            background: #2d2d44;
+            padding: 15px;
+            border-radius: 10px;
+            width: 45%;
+        }
+        
+        .level-bar {
+            background: #2d2d44;
+            height: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .level-progress {
+            background: #4e54c8;
+            height: 100%;
+            width: 0%;
+        }
+        
+        .bank-card {
+            width: 300px;
+            height: 180px;
+            background: #1e3c72;
+            border-radius: 15px;
+            margin: 0 auto 30px;
+            padding: 20px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .upgrades {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .upgrade {
+            background: #2d2d44;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        
+        .upgrade:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">FARMKES</h1>
+        <p>Кликай и зарабатывай на FARMKES</p>
+    </div>
+    
+    <div class="stats">
+        <div class="stat-box">
+            <div>Монеты</div>
+            <div id="coins">0</div>
+        </div>
+        <div class="stat-box">
+            <div>Уровень</div>
+            <div id="level">1</div>
+        </div>
+    </div>
+    
+    <div class="level-info">
+        До следующего уровня: <span id="level-progress-text">0/100</span>
+    </div>
+    <div class="level-bar">
+        <div class="level-progress" id="level-progress-bar"></div>
+    </div>
+    
+    <div class="bank-card" id="bank-card">
+        <h3>FARMKES CARD</h3>
+        <p>Кликай для заработка!</p>
+    </div>
+    
+    <div class="upgrades" id="upgrades-container">
+        <!-- Улучшения появятся здесь -->
+    </div>
+
+    <script>
+        // Игровые переменные
+        let coins = 0;
+        let level = 1;
+        let exp = 0;
+        let expToNextLevel = 100;
+        let clickValue = 1;
+        
+        // Элементы страницы
+        const coinsElement = document.getElementById('coins');
+        const levelElement = document.getElementById('level');
+        const levelProgressText = document.getElementById('level-progress-text');
+        const levelProgressBar = document.getElementById('level-progress-bar');
+        const bankCard = document.getElementById('bank-card');
+        const upgradesContainer = document.getElementById('upgrades-container');
+        
+        // Улучшения
+        const upgrades = [
+            {
+                id: 1,
+                name: "Улучшенный клик",
+                description: "+1 монета за клик",
+                cost: 10,
+                effect: () => { clickValue += 1; }
+            },
+            {
+                id: 2,
+                name: "Двойной доход",
+
+
+description: "x2 монеты за клик",
+                cost: 50,
+                effect: () => { clickValue *= 2; }
+            }
+        ];
+        
+        // Создаем улучшения на странице
+        function createUpgrades() {
+            upgrades.forEach(upgrade => {
+                const upgradeElement = document.createElement('div');
+                upgradeElement.className = 'upgrade';
+                upgradeElement.innerHTML = 
+                    <div><strong>${upgrade.name}</strong></div>
+                    <div>${upgrade.description}</div>
+                    <div>Цена: ${upgrade.cost} монет</div>
+                ;
+                
+                upgradeElement.addEventListener('click', () => {
+                    if (coins >= upgrade.cost) {
+                        coins -= upgrade.cost;
+                        upgrade.effect();
+                        updateUI();
+                        alert('Вы купили улучшение! ✨');
+                    } else {
+                        alert('Недостаточно монет!');
+                    }
+                });
+                
+                upgradesContainer.appendChild(upgradeElement);
+            });
+        }
+        
+        // Обработка клика по карте
+        bankCard.addEventListener('click', () => {
+            // Добавляем монеты
+            coins += clickValue;
+            exp += 1;
+            
+            // Проверяем уровень
+            if (exp >= expToNextLevel) {
+                level += 1;
+                exp = 0;
+                expToNextLevel = Math.floor(expToNextLevel * 1.5);
+                alert('Вы подняли уровень!');
+            }
+            
+            // Обновляем интерфейс
+            updateUI();
+        });
+        
+        // Обновление интерфейса
+        function updateUI() {
+            coinsElement.textContent = coins;
+            levelElement.textContent = level;
+            levelProgressText.textContent = ${exp}/${expToNextLevel};
+            levelProgressBar.style.width = ${(exp / expToNextLevel) * 100}%;
+        }
+        
+        // Запуск игры
+        createUpgrades();
+        updateUI();
+    </script>
+</body>
+</html>
